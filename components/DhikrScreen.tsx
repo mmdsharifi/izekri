@@ -1,11 +1,7 @@
 import React, { useState, useEffect, useMemo } from "react";
 import type { Category, Dhikr } from "../types";
 import { ALL_DHIKR } from "../constants";
-import AudioPlayer from "./AudioPlayer";
-import ProgressBar from "./ProgressBar";
-import { useAudio } from "../hooks/useAudio";
 import {
-  ArrowRightIcon,
   CheckCircleIcon,
   XCircleIcon,
   ClockIcon,
@@ -13,6 +9,10 @@ import {
   BookOpenIcon,
   SpeakerIcon,
 } from "./icons";
+import StageLearn from "./DhikrScreen/StageLearn";
+import StageTranslate from "./DhikrScreen/StageTranslate";
+import StageScramble from "./DhikrScreen/StageScramble";
+import StageFillGaps from "./DhikrScreen/StageFillGaps";
 
 interface DhikrScreenProps {
   category: Category;
@@ -30,6 +30,9 @@ interface DhikrScreenProps {
   ) => void;
   onCompleteReview: (categoryId: string, reviewId: string) => void;
   sessionStartTime: number | null;
+  setHeaderStageIndex?: (n: number) => void;
+  setHeaderTotalStages?: (n: number) => void;
+  setHeaderItemIndex?: (n: number) => void;
 }
 
 const shuffleArray = <T,>(array: T[]): T[] => {
@@ -37,25 +40,7 @@ const shuffleArray = <T,>(array: T[]): T[] => {
 };
 
 // A small, inline audio button
-const InlineAudioButton = ({ src }: { src: string }) => {
-  const { playing, toggle } = useAudio(src);
-  return (
-    <button
-      onClick={(e) => {
-        e.stopPropagation();
-        toggle();
-      }}
-      className={`p-2 rounded-full transition-colors flex-shrink-0 ${
-        playing
-          ? "text-teal-500 bg-teal-100 dark:bg-teal-800"
-          : "text-gray-500 dark:text-gray-400 hover:bg-gray-200 dark:hover:bg-gray-700"
-      }`}
-      aria-label="Play audio"
-    >
-      <SpeakerIcon className="w-5 h-5" />
-    </button>
-  );
-};
+// Removed: const InlineAudioButton = ({ src }: { src: string }) => { ... }
 
 const STAGES_CONFIG = [
   { name: "Learn", points: 20 },
@@ -64,29 +49,6 @@ const STAGES_CONFIG = [
   { name: "Complete", points: 100 },
 ];
 const TOTAL_STAGES = STAGES_CONFIG.length;
-
-const ProgressStepper = ({
-  current,
-  total,
-}: {
-  current: number;
-  total: number;
-}) => (
-  <div className="flex items-center justify-center gap-2 my-4">
-    {Array.from({ length: total }).map((_, index) => (
-      <div
-        key={index}
-        className={`w-3 h-3 rounded-full transition-all ${
-          index < current
-            ? "bg-teal-500"
-            : index === current
-            ? "bg-teal-500 scale-125"
-            : "bg-gray-300 dark:bg-gray-600"
-        }`}
-      />
-    ))}
-  </div>
-);
 
 const CategorySummaryView = ({
   score,
@@ -237,7 +199,9 @@ const ReviewMode = ({
         <span>درس مروری</span>
       </div>
       <div className="flex items-center justify-center gap-3 mb-8">
-        <InlineAudioButton src={currentQuestion.audioUrl} />
+        {currentQuestion.audioUrl && (
+          <audio src={currentQuestion.audioUrl} controls className="mx-2" />
+        )}
         <p
           className="font-serif text-2xl md:text-3xl leading-relaxed text-gray-800 dark:text-gray-100 whitespace-pre-line"
           lang="ar"
@@ -299,14 +263,16 @@ export default function DhikrScreen({
   onUpdateProgress,
   onCompleteReview,
   sessionStartTime,
-}: DhikrScreenProps) {
+  setHeaderStageIndex,
+  setHeaderTotalStages,
+  setHeaderItemIndex,
+  onFooterControlsChange, // تابع جدید برای ارسال کنترل‌ها به App
+}: DhikrScreenProps & { onFooterControlsChange?: (controls: any) => void }) {
   const [itemIndex, setItemIndex] = useState(0);
   const [stageIndex, setStageIndex] = useState(0);
-
   const [showSummary, setShowSummary] = useState(false);
   const [showPostDhikrNav, setShowPostDhikrNav] = useState(false);
   const [duration, setDuration] = useState(0);
-
   // State for stage-specific interactions
   const [answerState, setAnswerState] = useState<{
     isCorrect: boolean | null;
@@ -324,7 +290,6 @@ export default function DhikrScreen({
     options: string[];
     filled: (string | null)[];
   }>({ words: [], hiddenIndices: [], options: [], filled: [] });
-
   const categoryItems = useMemo(() => category.dhikrIds, [category.id]);
   const currentItem = useMemo(
     () => categoryItems[itemIndex],
@@ -411,6 +376,18 @@ export default function DhikrScreen({
     findFirstIncomplete();
   }, [category.id, progressData]);
 
+  useEffect(() => {
+    if (setHeaderStageIndex) setHeaderStageIndex(stageIndex);
+    if (setHeaderTotalStages) setHeaderTotalStages(TOTAL_STAGES);
+    if (setHeaderItemIndex) setHeaderItemIndex(itemIndex);
+  }, [
+    stageIndex,
+    setHeaderStageIndex,
+    setHeaderTotalStages,
+    itemIndex,
+    setHeaderItemIndex,
+  ]);
+
   const advanceToNext = () => {
     if (!currentDhikr) return;
 
@@ -471,39 +448,218 @@ export default function DhikrScreen({
     setupStage(itemIndex, stageIndex);
   };
 
-  if (showSummary)
-    return (
+  const handleQuizAnswer = (answer: string) => {
+    if (answerState.isCorrect !== null) return;
+    if (answer === currentDhikr?.translation) {
+      setAnswerState({
+        isCorrect: true,
+        message: `فوق‌العاده! ${STAGES_CONFIG[1].points} 💎 گرفتی.`,
+      });
+    } else {
+      setAnswerState({ isCorrect: false, message: "اشتباه بود!" });
+    }
+  };
+
+  const handleScrambleOptionClick = (word: string, index: number) => {
+    if (answerState.isCorrect !== null) return;
+    if (!currentDhikr) return;
+    if (scrambledAnswer.length < scrambledWords.length) {
+      // Determine the correct sequence
+      const correctSequence =
+        currentDhikr.scrambleChunks ||
+        currentDhikr.arabic.split(/\s+/).filter(Boolean);
+      const expectedWord = correctSequence[scrambledAnswer.length];
+      if (word === expectedWord) {
+        setScrambledAnswer([...scrambledAnswer, word]);
+        setScrambleIncorrectWord(null);
+      } else {
+        setScrambleIncorrectWord(word);
+      }
+    }
+  };
+
+  const handleScrambleAnswerClick = (word: string, index: number) => {
+    if (answerState.isCorrect !== null) return;
+    if (scrambledAnswer.length > 0) {
+      if (scrambledAnswer[index] === word) {
+        setScrambledAnswer([
+          ...scrambledAnswer.slice(0, index),
+          ...scrambledAnswer.slice(index + 1),
+        ]);
+      } else {
+        setScrambleIncorrectWord(word);
+      }
+    }
+  };
+
+  const handleFillGapOptionClick = (word: string) => {
+    if (answerState.isCorrect !== null) return;
+    const currentGapIndex = fillGaps.filled.findIndex((w) => w === null);
+    if (currentGapIndex === -1) return;
+
+    const newFilled = [...fillGaps.filled];
+    newFilled[currentGapIndex] = word;
+    setFillGaps({ ...fillGaps, filled: newFilled });
+  };
+
+  const checkFillGapsAnswer = () => {
+    const correctWords = fillGaps.hiddenIndices.map((i) => fillGaps.words[i]);
+    const isAnswerCorrect = fillGaps.filled.every(
+      (w, i) => w === correctWords[i]
+    );
+    if (isAnswerCorrect) {
+      setAnswerState({
+        isCorrect: true,
+        message: `فوق‌العاده! ${STAGES_CONFIG[3].points} 💎 گرفتی.`,
+      });
+    } else {
+      setAnswerState({ isCorrect: false, message: "اشتباه بود!" });
+    }
+  };
+
+  useEffect(() => {
+    // Only run in FillGaps stage
+    if (stageIndex === 3 && answerState.isCorrect === null) {
+      // If all gaps are filled (no nulls)
+      if (
+        fillGaps.filled.length > 0 &&
+        fillGaps.filled.every((w) => w !== null)
+      ) {
+        checkFillGapsAnswer();
+      }
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [fillGaps.filled, stageIndex]);
+
+  useEffect(() => {
+    // Only run in Scramble stage
+    if (stageIndex === 2 && answerState.isCorrect === null) {
+      if (
+        scrambledAnswer.length > 0 &&
+        scrambledAnswer.length === scrambledWords.length
+      ) {
+        const correctSequence =
+          currentDhikr?.scrambleChunks ||
+          currentDhikr?.arabic.split(/\s+/).filter(Boolean) ||
+          [];
+        const isCorrect = scrambledAnswer.every(
+          (w, i) => w === correctSequence[i]
+        );
+        if (isCorrect) {
+          setAnswerState({
+            isCorrect: true,
+            message: `فوق‌العاده! ${STAGES_CONFIG[2].points} 💎 گرفتی.`,
+          });
+        } else {
+          setAnswerState({ isCorrect: false, message: "اشتباه بود!" });
+        }
+      }
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [scrambledAnswer, scrambledWords, stageIndex]);
+
+  // Place renderStageContent after all handlers
+  const renderStageContent = () => {
+    if (!currentDhikr) return null;
+    switch (stageIndex) {
+      case 0:
+        return (
+          <StageLearn
+            arabic={currentDhikr.arabic}
+            translation={currentDhikr.translation}
+            virtue={currentDhikr.virtue}
+            audioUrl={currentDhikr.audioUrl}
+            onContinue={handleNextClick}
+          />
+        );
+      case 1:
+        return (
+          <StageTranslate
+            arabic={currentDhikr.arabic}
+            audioUrl={currentDhikr.audioUrl}
+            options={quizOptions}
+            correct={currentDhikr.translation}
+            answerState={answerState}
+            onAnswer={handleQuizAnswer}
+            onTryAgain={handleTryAgain}
+            onContinue={handleNextClick}
+          />
+        );
+      case 2:
+        return (
+          <StageScramble
+            words={scrambledWords}
+            userSequence={scrambledAnswer}
+            answerState={answerState}
+            onWordClick={(word) =>
+              handleScrambleOptionClick(word, scrambledWords.indexOf(word))
+            }
+            onRemoveLast={(word, idx) => handleScrambleAnswerClick(word, idx)}
+            onTryAgain={handleTryAgain}
+            onContinue={handleNextClick}
+            correctSequence={
+              currentDhikr.scrambleChunks ||
+              currentDhikr.arabic.split(/\s+/).filter(Boolean)
+            }
+            scrambleIncorrectWord={scrambleIncorrectWord}
+            audioUrl={currentDhikr.audioUrl}
+          />
+        );
+      case 3:
+        return (
+          <StageFillGaps
+            sentenceParts={fillGaps.words.map((w, i) =>
+              fillGaps.hiddenIndices.includes(i) ? "" : w
+            )}
+            options={fillGaps.options}
+            filled={fillGaps.filled}
+            answerState={answerState}
+            onSelect={(word, gapIdx) => handleFillGapOptionClick(word)}
+            onGapClick={(gapIdx) => {
+              if (answerState.isCorrect !== null) return;
+              // Remove word from gap
+              const newFilled = [...fillGaps.filled];
+              newFilled[gapIdx] = null;
+              setFillGaps({ ...fillGaps, filled: newFilled });
+            }}
+            onTryAgain={handleTryAgain}
+            onContinue={handleNextClick}
+            correct={fillGaps.hiddenIndices
+              .map((i) => fillGaps.words[i])
+              .join(" ")}
+            disabled={answerState.isCorrect !== null}
+            audioUrl={currentDhikr.audioUrl}
+          />
+        );
+      default:
+        return null;
+    }
+  };
+
+  // Remove all early returns and use a single content variable
+  let content = null;
+  if (showSummary) {
+    content = (
       <CategorySummaryView
         score={progressData.score}
         duration={duration}
         onFinish={onBack}
       />
     );
-
-  const totalItems = category.dhikrIds.length;
-  let completedItems = 0;
-  category.dhikrIds.forEach((_item, i) => {
-    if (i < itemIndex) completedItems++;
-  });
-  const overallProgressPercentage =
-    totalItems > 0 ? (completedItems / totalItems) * 100 : 0;
-
-  if (showPostDhikrNav) {
-    return (
+  } else if (showPostDhikrNav) {
+    content = (
       <div className="p-4 sm:p-6 min-h-[calc(100vh-68px)] flex flex-col">
         <PostDhikrNav onNext={handleGoToNextItem} onDashboard={onBack} />
       </div>
     );
-  }
-
-  if (typeof currentItem === "string") {
+  } else if (typeof currentItem === "string") {
     const reviewDhikrIds = category.dhikrIds
       .slice(0, itemIndex)
       .filter((id) => typeof id === "number") as number[];
     const dhikrsToReview = ALL_DHIKR.filter((d) =>
       reviewDhikrIds.includes(d.id)
     ).slice(-3);
-    return (
+    content = (
       <div className="p-4 sm:p-6 min-h-[calc(100vh-68px)] flex flex-col">
         <ReviewMode
           dhikrsToReview={dhikrsToReview}
@@ -511,384 +667,21 @@ export default function DhikrScreen({
         />
       </div>
     );
+  } else if (!currentDhikr) {
+    content = <div className="p-4">در حال بارگذاری...</div>;
+  } else {
+    content = (
+      <div className="flex-1 flex flex-col justify-center p-2 sm:p-4 mt-4 mb-2">
+        {renderStageContent()}
+      </div>
+    );
   }
-
-  if (!currentDhikr) return <div className="p-4">در حال بارگذاری...</div>;
-
-  const handleQuizAnswer = (answer: string) => {
-    if (answerState.isCorrect !== null) return;
-    if (answer === currentDhikr.translation) {
-      setAnswerState({
-        isCorrect: true,
-        message: `آفرین! ${STAGES_CONFIG[1].points} امتیاز گرفتی.`,
-      });
-    } else {
-      setAnswerState({ isCorrect: false, message: "اشتباه بود!" });
-    }
-  };
-  const handleScrambleOptionClick = (word: string, index: number) => {
-    if (answerState.isCorrect) return;
-    const correctSequence =
-      currentDhikr.scrambleChunks ||
-      currentDhikr.arabic.split(/\s+/).filter(Boolean);
-    const nextCorrectWord = correctSequence[scrambledAnswer.length];
-    if (word === nextCorrectWord) {
-      setScrambledAnswer([...scrambledAnswer, word]);
-      const newOptions = [...scrambledWords];
-      newOptions.splice(index, 1);
-      setScrambledWords(newOptions);
-      setScrambleIncorrectWord(null);
-      if (scrambledAnswer.length + 1 === correctSequence.length) {
-        setAnswerState({
-          isCorrect: true,
-          message: `عالی بود! ${STAGES_CONFIG[2].points} امتیاز گرفتی.`,
-        });
-      }
-    } else {
-      setScrambleIncorrectWord(word);
-      setTimeout(() => setScrambleIncorrectWord(null), 800);
-    }
-  };
-  const handleScrambleAnswerClick = (word: string, index: number) => {
-    if (answerState.isCorrect) return;
-    if (index === scrambledAnswer.length - 1) {
-      const newAnswer = scrambledAnswer.slice(0, -1);
-      setScrambledAnswer(newAnswer);
-      setScrambledWords([...scrambledWords, word]);
-    }
-  };
-  const handleFillGapOptionClick = (word: string) => {
-    if (answerState.isCorrect !== null) return;
-    const nextGapIndex = fillGaps.filled.findIndex((g) => g === null);
-    if (nextGapIndex !== -1) {
-      const newFilled = [...fillGaps.filled];
-      newFilled[nextGapIndex] = word;
-      setFillGaps({ ...fillGaps, filled: newFilled });
-    }
-  };
-  const handleFillGapClick = (gapIndex: number) => {
-    if (answerState.isCorrect !== null) return;
-    const newFilled = [...fillGaps.filled];
-    newFilled[gapIndex] = null;
-    setFillGaps({ ...fillGaps, filled: newFilled });
-  };
-  const checkFillGapsAnswer = () => {
-    const correctWords = fillGaps.hiddenIndices.map((i) => fillGaps.words[i]);
-    const isAnswerCorrect =
-      JSON.stringify(fillGaps.filled.sort()) ===
-      JSON.stringify(correctWords.sort());
-    if (isAnswerCorrect) {
-      setAnswerState({
-        isCorrect: true,
-        message: `فوق‌العاده! ${STAGES_CONFIG[3].points} امتیاز گرفتی.`,
-      });
-    } else {
-      setAnswerState({ isCorrect: false, message: "اشتباه بود!" });
-    }
-  };
-
-  const renderStageContent = () => {
-    switch (stageIndex) {
-      case 0:
-        return (
-          <div className="text-center">
-            <p
-              className="font-serif text-3xl md:text-4xl leading-[3.5rem] md:leading-[4rem] text-gray-800 dark:text-gray-100 mb-4 whitespace-pre-line"
-              lang="ar"
-            >
-              {currentDhikr.arabic}
-            </p>
-            <p className="text-lg text-gray-600 dark:text-gray-300 mt-4 whitespace-pre-line leading-relaxed md:leading-8">
-              {currentDhikr.translation}
-            </p>
-            <div className="bg-gray-100 dark:bg-gray-700/50 p-4 rounded-lg mt-6">
-              <h4 className="font-bold text-gray-800 dark:text-white mb-2">
-                فضیلت و کاربرد:
-              </h4>
-              <p className="text-gray-600 dark:text-gray-300">
-                {currentDhikr.virtue}
-              </p>
-            </div>
-          </div>
-        );
-      case 1:
-        return (
-          <div>
-            <div className="flex items-center justify-center gap-4 mb-8">
-              <InlineAudioButton src={currentDhikr.audioUrl} />
-              <p
-                className="font-serif text-2xl md:text-3xl text-center leading-relaxed text-gray-800 dark:text-gray-100 whitespace-pre-line"
-                lang="ar"
-              >
-                {currentDhikr.arabic}
-              </p>
-            </div>
-            <h3 className="text-center font-bold text-lg mb-4 text-gray-700 dark:text-gray-200">
-              کدام ترجمه صحیح است؟
-            </h3>
-            <div className="grid grid-cols-1 gap-3">
-              {quizOptions.map((option) => (
-                <button
-                  key={option}
-                  onClick={() => handleQuizAnswer(option)}
-                  disabled={answerState.isCorrect !== null}
-                  className="w-full text-right p-4 bg-gray-100 dark:bg-gray-700 rounded-lg hover:bg-teal-100 dark:hover:bg-teal-800 disabled:opacity-70 whitespace-pre-line"
-                >
-                  {option}
-                </button>
-              ))}
-            </div>
-          </div>
-        );
-      case 2:
-        const correctSequence =
-          currentDhikr.scrambleChunks ||
-          currentDhikr.arabic.split(/\s+/).filter(Boolean);
-        const nextCorrectWord = answerState.isCorrect
-          ? null
-          : correctSequence[scrambledAnswer.length];
-        return (
-          <div>
-            <div className="flex items-center justify-center gap-3 mb-4">
-              <InlineAudioButton src={currentDhikr.audioUrl} />
-              <h3 className="text-center font-bold text-lg text-gray-700 dark:text-gray-200">
-                کلمات را به ترتیب صحیح بچینید:
-              </h3>
-            </div>
-            <p className="text-center text-lg text-gray-600 dark:text-gray-300 mt-4 mb-4 whitespace-pre-line">
-              {currentDhikr.translation}
-            </p>
-            <div
-              dir="rtl"
-              className="p-4 min-h-[6rem] bg-gray-100 dark:bg-gray-700/50 rounded-lg flex flex-wrap-reverse justify-center items-center gap-2 font-serif text-2xl"
-            >
-              {scrambledAnswer.map((word, i) => (
-                <span
-                  key={i}
-                  onClick={() => handleScrambleAnswerClick(word, i)}
-                  className="cursor-pointer p-1 px-2 bg-white dark:bg-gray-800 rounded-md shadow-sm whitespace-pre-line leading-relaxed"
-                >
-                  {word}
-                </span>
-              ))}
-              {scrambledAnswer.length < correctSequence.length &&
-                !answerState.isCorrect && (
-                  <span className="inline-block w-8 h-1 bg-teal-500 rounded-full animate-pulse mx-1"></span>
-                )}
-            </div>
-            <div className="flex flex-wrap justify-center gap-3 mt-6">
-              {scrambledWords.map((word, i) => {
-                const isIncorrect = scrambleIncorrectWord === word;
-                const isHint =
-                  scrambleIncorrectWord !== null && word === nextCorrectWord;
-                return (
-                  <button
-                    key={`${word}-${i}`}
-                    onClick={() => handleScrambleOptionClick(word, i)}
-                    disabled={answerState.isCorrect}
-                    className={`font-serif px-4 py-2 text-gray-800 dark:text-gray-100 rounded-lg transition-all duration-200 transform ${
-                      isIncorrect
-                        ? "bg-red-300 dark:bg-red-700 animate-shake"
-                        : isHint
-                        ? "bg-green-300 dark:bg-green-700 ring-2 ring-green-500 animate-pulse"
-                        : "bg-gray-200 dark:bg-gray-700 hover:bg-teal-100 dark:hover:bg-teal-900 hover:scale-105 disabled:opacity-50"
-                    } whitespace-pre-line leading-relaxed`}
-                  >
-                    {word}
-                  </button>
-                );
-              })}
-            </div>
-          </div>
-        );
-      case 3:
-        return (
-          <div>
-            <div className="flex items-center justify-center gap-3 mb-4">
-              <InlineAudioButton src={currentDhikr.audioUrl} />
-              <h3 className="text-center font-bold text-lg text-gray-700 dark:text-gray-200">
-                ذکر را کامل کنید:
-              </h3>
-            </div>
-            <p className="text-lg text-gray-600 dark:text-gray-300 mt-4 text-center whitespace-pre-line">
-              {currentDhikr.translation}
-            </p>
-            <div className="text-center my-6">
-              <p
-                className="font-serif text-3xl md:text-4xl leading-[3.5rem] md:leading-[4rem] text-gray-800 dark:text-gray-100"
-                lang="ar"
-              >
-                {fillGaps.words.map((word, index) => {
-                  const hiddenIndex = fillGaps.hiddenIndices.indexOf(index);
-                  if (hiddenIndex !== -1) {
-                    return (
-                      <span
-                        key={index}
-                        onClick={() => handleFillGapClick(hiddenIndex)}
-                        className={`inline-block border-b-2 border-dashed border-teal-500 min-w-[70px] text-center px-2 mx-1 align-middle ${
-                          fillGaps.filled[hiddenIndex]
-                            ? "text-gray-800 dark:text-gray-100 cursor-pointer"
-                            : "text-gray-400 dark:text-gray-500"
-                        }`}
-                      >
-                        {fillGaps.filled[hiddenIndex] || "..."}
-                      </span>
-                    );
-                  }
-                  return ` ${word} `;
-                })}
-              </p>
-            </div>
-            <div className="flex flex-wrap justify-center gap-3 mt-4">
-              {fillGaps.options.map((option, index) => (
-                <button
-                  key={index}
-                  onClick={() => handleFillGapOptionClick(option)}
-                  disabled={
-                    answerState.isCorrect !== null ||
-                    fillGaps.filled.includes(option)
-                  }
-                  className="font-serif px-4 py-2 bg-gray-200 dark:bg-gray-700 text-gray-800 dark:text-gray-100 rounded-lg hover:bg-teal-100 dark:hover:bg-teal-900 disabled:opacity-50"
-                >
-                  {option}
-                </button>
-              ))}
-            </div>
-            {fillGaps.filled.every((g) => g !== null) &&
-              answerState.isCorrect === null && (
-                <div className="text-center mt-6">
-                  <button
-                    onClick={checkFillGapsAnswer}
-                    className="px-8 py-3 bg-teal-500 text-white font-bold rounded-lg hover:bg-teal-600"
-                  >
-                    بررسی پاسخ
-                  </button>
-                </div>
-              )}
-          </div>
-        );
-      default:
-        return null;
-    }
-  };
-
-  const renderFooter = () => {
-    if (answerState.isCorrect === true) {
-      return (
-        <div
-          className={`mt-6 p-4 rounded-lg flex items-center justify-between bg-green-100 dark:bg-green-900/50 text-green-800 dark:text-green-200`}
-        >
-          <div className="flex items-center gap-2">
-            <CheckCircleIcon className="w-6 h-6" />
-            <span className="font-bold">{answerState.message}</span>
-          </div>
-          <button
-            onClick={handleNextClick}
-            className="px-6 py-2 bg-green-500 text-white font-bold rounded-lg hover:bg-green-600"
-          >
-            ادامه
-          </button>
-        </div>
-      );
-    }
-    if (answerState.isCorrect === false) {
-      let correctAnswerDisplay = null;
-      if (stageIndex === 1 && currentDhikr) {
-        // Quiz
-        correctAnswerDisplay = (
-          <div className="border-t border-red-200 dark:border-red-700 mt-3 pt-3">
-            <p className="font-semibold">پاسخ صحیح:</p>
-            <p className="whitespace-pre-line">{currentDhikr.translation}</p>
-          </div>
-        );
-      } else if (stageIndex === 3 && currentDhikr) {
-        // Fill Gaps
-        correctAnswerDisplay = (
-          <div className="border-t border-red-200 dark:border-red-700 mt-3 pt-3">
-            <p className="font-semibold">ذکر صحیح:</p>
-            <p className="font-serif text-lg whitespace-pre-line" lang="ar">
-              {currentDhikr.arabic}
-            </p>
-          </div>
-        );
-      }
-
-      return (
-        <div
-          className={`mt-6 p-4 rounded-lg text-right bg-red-100 dark:bg-red-900/50 text-red-800 dark:text-red-200`}
-        >
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-2">
-              <XCircleIcon className="w-6 h-6" />
-              <span className="font-bold">{answerState.message}</span>
-            </div>
-            <button
-              onClick={handleTryAgain}
-              className="px-6 py-2 bg-red-500 text-white font-bold rounded-lg hover:bg-red-600"
-            >
-              تلاش مجدد
-            </button>
-          </div>
-          {correctAnswerDisplay}
-        </div>
-      );
-    }
-    if (stageIndex === 0 && currentDhikr) {
-      return (
-        <div className="flex justify-between items-center mt-8 pt-4 border-t border-gray-200 dark:border-gray-700">
-          <AudioPlayer
-            key={`${currentDhikr.id}-audio`}
-            src={currentDhikr.audioUrl}
-          />
-          <button
-            onClick={handleNextClick}
-            className="px-8 py-3 bg-teal-500 text-white font-bold rounded-lg hover:bg-teal-600 transition-transform transform hover:scale-105"
-          >
-            یاد گرفتم، ادامه
-          </button>
-        </div>
-      );
-    }
-    return null;
-  };
-
   return (
-    <div className="p-4 sm:p-6 min-h-[calc(100vh-68px)] flex flex-col">
-      <header className="flex-shrink-0">
-        <div className="flex justify-between items-center mb-2">
-          <button
-            onClick={onBack}
-            className="flex items-center gap-2 text-gray-600 dark:text-gray-300 hover:text-teal-500 dark:hover:text-teal-400"
-          >
-            <ArrowRightIcon className="w-5 h-5 transform rotate-180" />
-            <span>بازگشت</span>
-          </button>
-          <span className="text-lg font-bold text-gray-800 dark:text-gray-100">
-            {category.title}
-          </span>
-        </div>
-        <div className="flex justify-between items-center text-sm mb-2 text-gray-600 dark:text-gray-300 px-1">
-          <span>
-            امتیاز شما:{" "}
-            <span className="font-bold text-teal-500">
-              {progressData.score}
-            </span>
-          </span>
-          <span>{Math.round(overallProgressPercentage)}%</span>
-        </div>
-        <ProgressBar progress={overallProgressPercentage} />
-        {typeof currentItem === "number" && (
-          <ProgressStepper current={stageIndex} total={TOTAL_STAGES} />
-        )}
-      </header>
-
-      <main className="flex-grow flex flex-col justify-center bg-white dark:bg-gray-800 rounded-2xl shadow-lg p-6 my-4">
-        <div className="flex-grow flex flex-col justify-center">
-          {renderStageContent()}
-        </div>
-      </main>
-
-      <footer className="flex-shrink-0">{renderFooter()}</footer>
+    <div className="p-4 sm:p-6 flex flex-col min-h-[calc(100vh-68px-56px)] h-[calc(100vh-68px-56px)]">
+      {/* Removed: Top score and percentage bar, ProgressBar, ProgressStepper */}
+      {/* حذف تب‌بار پایین */}
+      {/* هیچ NavBar یا BottomTabBar در این صفحه رندر نشود */}
+      {content}
     </div>
   );
 }
