@@ -150,7 +150,7 @@ export const ALL_DHIKR: Dhikr[] = [
     transliteration: "Allāhumma anta rabbī lā ilāha illā ant...",
     virtue:
       "هر كس با یقین در روز بگوید و قبل از شب بمیرد، از اهل بهشت است و هر كس با یقین در شب بگوید و قبل از صبح بمیرد، از اهل بهشت است.",
-    audioUrl: "https://hisnmuslim.com/audio/ar/82.mp3",
+    audioUrl: "https://hisnmuslim.com/audio/ar/79.mp3",
     points: 30,
     scrambleChunks: [
       "اللَّهُمَّ أَنْتَ رَبِّی لا إِلَهَ إِلاَّ أَنْتَ،",
