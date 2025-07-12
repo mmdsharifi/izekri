@@ -1,53 +1,75 @@
 
-import { useState, useEffect, useMemo, useCallback } from 'react';
+import { useState, useEffect, useMemo, useCallback, useRef } from 'react';
 
 export const useAudio = (url: string) => {
-  const audio = useMemo(() => {
-    if (url) {
-      try {
-        return new Audio(url);
-      } catch (error) {
-        console.error(`Failed to create audio object for url: ${url}`, error);
-        return null;
-      }
-    }
-    return null;
-  }, [url]);
-  
+  const audioRef = useRef<HTMLAudioElement | null>(null);
   const [playing, setPlaying] = useState(false);
 
+  // Clean up previous audio instance when URL changes
+  useEffect(() => {
+    if (audioRef.current) {
+      audioRef.current.pause();
+      audioRef.current.src = '';
+      audioRef.current.load();
+    }
+    
+    if (url) {
+      try {
+        audioRef.current = new Audio(url);
+      } catch (error) {
+        console.error(`Failed to create audio object for url: ${url}`, error);
+        audioRef.current = null;
+      }
+    } else {
+      audioRef.current = null;
+    }
+  }, [url]);
+
   const toggle = useCallback(() => {
-    if (audio) {
+    if (audioRef.current) {
       setPlaying(!playing);
     }
-  }, [audio, playing]);
+  }, [playing]);
 
   useEffect(() => {
-    if (!audio) return;
+    if (!audioRef.current) return;
 
-    const playPromise = playing ? audio.play() : null;
+    const playPromise = playing ? audioRef.current.play() : null;
     if (playPromise) {
         playPromise.catch(error => {
             console.error("Error playing audio:", error);
             setPlaying(false);
         });
     } else {
-        audio.pause();
+        audioRef.current.pause();
     }
-  }, [playing, audio]);
+  }, [playing]);
 
   useEffect(() => {
-    if (!audio) return;
+    if (!audioRef.current) return;
 
     const handleEnded = () => setPlaying(false);
-    audio.addEventListener('ended', handleEnded);
+    audioRef.current.addEventListener('ended', handleEnded);
     return () => {
-      audio.removeEventListener('ended', handleEnded);
-      if (!audio.paused) {
-          audio.pause();
+      if (audioRef.current) {
+        audioRef.current.removeEventListener('ended', handleEnded);
+        if (!audioRef.current.paused) {
+            audioRef.current.pause();
+        }
       }
     };
-  }, [audio]);
+  }, []);
+
+  // Cleanup on unmount
+  useEffect(() => {
+    return () => {
+      if (audioRef.current) {
+        audioRef.current.pause();
+        audioRef.current.src = '';
+        audioRef.current.load();
+      }
+    };
+  }, []);
 
   return { playing, toggle };
 };

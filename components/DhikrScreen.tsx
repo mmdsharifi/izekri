@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useMemo } from "react";
+import React, { useState, useEffect, useMemo, useCallback } from "react";
 import type { Category, Dhikr } from "../types";
 import { ALL_DHIKR } from "../constants";
 import {
@@ -502,7 +502,7 @@ export default function DhikrScreen({
     setFillGaps({ ...fillGaps, filled: newFilled });
   };
 
-  const checkFillGapsAnswer = () => {
+  const checkFillGapsAnswer = useCallback(() => {
     const correctWords = fillGaps.hiddenIndices.map((i) => fillGaps.words[i]);
     const isAnswerCorrect = fillGaps.filled.every(
       (w, i) => w === correctWords[i]
@@ -515,7 +515,7 @@ export default function DhikrScreen({
     } else {
       setAnswerState({ isCorrect: false, message: "اشتباه بود!" });
     }
-  };
+  }, [fillGaps.hiddenIndices, fillGaps.words, fillGaps.filled]);
 
   useEffect(() => {
     // Only run in FillGaps stage
@@ -528,8 +528,7 @@ export default function DhikrScreen({
         checkFillGapsAnswer();
       }
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [fillGaps.filled, stageIndex]);
+  }, [fillGaps.filled, stageIndex, answerState.isCorrect, checkFillGapsAnswer]);
 
   useEffect(() => {
     // Only run in Scramble stage

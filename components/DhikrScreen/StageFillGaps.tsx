@@ -40,8 +40,8 @@ const StageFillGaps: React.FC<StageFillGapsProps> = ({
   const [activeGap, setActiveGap] = React.useState<number | null>(null);
 
   React.useEffect(() => {
-    // Auto-select first empty gap if none active
-    if (activeGap === null || filled[activeGap]) {
+    // Auto-select first empty gap if none active or current gap is filled
+    if (activeGap === null || (activeGap !== null && filled[activeGap])) {
       const firstEmpty = filled.findIndex((f) => !f);
       setActiveGap(firstEmpty !== -1 ? firstEmpty : null);
     }
