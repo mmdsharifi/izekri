@@ -1,0 +1,18 @@
+# Project Structure Guide
+
+- Main entry point: [App.tsx](mdc:App.tsx)
+- All UI components: [components/](mdc:components/)
+- Data and constants: [constants.ts](mdc:constants.ts)
+- TypeScript types: [types.ts](mdc:types.ts)
+- Test files: co-located with components, e.g. [components/DhikrScreen/StageLearn.test.tsx](mdc:components/DhikrScreen/StageLearn.test.tsx)
+- Test setup: [setupTests.ts](mdc:setupTests.ts)
+- Build and config: [vite.config.ts](mdc:vite.config.ts), [package.json](mdc:package.json)
+- Coverage reports: [coverage/](mdc:coverage/)
+- Documentation: [README.md](mdc:README.md), [CHANGELOG.md](mdc:CHANGELOG.md)
+
+The app is a React + TypeScript project with Vite, Tailwind, and full test coverage. All features are modular and follow best practices for maintainability and scalability.
+description:
+globs:
+alwaysApply: false
+
+---

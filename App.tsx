@@ -6,6 +6,8 @@ import AdhkarListScreen from "./components/AdhkarListScreen";
 import { CATEGORIES, ALL_DHIKR } from "./constants";
 import type { Category, Progress } from "./types";
 import { useAudio } from "./hooks/useAudio";
+import { StagewiseToolbar } from "@stagewise/toolbar-react";
+import ReactPlugin from "@stagewise-plugins/react";
 
 const defaultProgressValue = {
   completedStages: {},
@@ -275,6 +277,11 @@ export default function App() {
           </button>
         </nav>
       )}
+      <StagewiseToolbar
+        config={{
+          plugins: [ReactPlugin],
+        }}
+      />
     </div>
   );
 }

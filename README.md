@@ -85,8 +85,6 @@ This project is licensed under the **MIT License**.
 
 You are free to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, as long as the original copyright and license notice appear in all copies.
 
-See [LICENSE](LICENSE) for the full text.
-
 ---
 
 **Hisnul Muslim: Daily Adhkar** — Interactive, beautiful, and open source for the Ummah.
