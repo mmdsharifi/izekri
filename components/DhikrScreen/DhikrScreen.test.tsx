@@ -1,7 +1,7 @@
 import React from "react";
 import { render, screen, fireEvent } from "@testing-library/react";
 import DhikrScreen from "../DhikrScreen";
-import type { Category, Dhikr } from "../../types";
+import type { Category, Subcategory, Dhikr } from "../../types";
 import * as constants from "../../constants";
 import { vi } from "vitest";
 import "@testing-library/jest-dom";
@@ -18,13 +18,20 @@ const sampleDhikr: Dhikr = {
   points: 10,
   scrambleChunks: ["سُبْحَانَ", "اللَّهِ"],
 };
+const sampleSubcategory: Subcategory = {
+  id: "sub1",
+  title: "تسبیحات",
+  subtitle: "ذکرهای تسبیح",
+  dhikrIds: [1],
+};
+
 const sampleCategory: Category = {
   id: "cat1",
   title: "تسبیحات",
   subtitle: "ذکرهای تسبیح",
   icon: () => null,
   color: "teal",
-  dhikrIds: [1],
+  subcategories: [sampleSubcategory],
 };
 
 describe("DhikrScreen container integration", () => {
@@ -50,6 +57,7 @@ describe("DhikrScreen container integration", () => {
     return render(
       <DhikrScreen
         category={sampleCategory}
+        subcategory={sampleSubcategory}
         progressData={progressData}
         onUpdateProgress={onUpdateProgress}
         onCompleteReview={onCompleteReview}

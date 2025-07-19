@@ -3,7 +3,7 @@ import { render, screen, fireEvent, waitFor } from "@testing-library/react";
 import DhikrScreen from "./DhikrScreen";
 import { vi } from "vitest";
 import * as constants from "../constants";
-import type { Category, Dhikr } from "../types";
+import type { Category, Subcategory, Dhikr } from "../types";
 
 describe("DhikrScreen FillGaps integration", () => {
   const sampleDhikr: Dhikr = {
@@ -18,13 +18,20 @@ describe("DhikrScreen FillGaps integration", () => {
     points: 10,
     transliteration: "alhamdu lillahi rabbil 'alamin",
   };
+  const sampleSubcategory: Subcategory = {
+    id: "sub1",
+    title: "سوره فاتحه",
+    subtitle: "سوره اول قرآن",
+    dhikrIds: [1],
+  };
+
   const sampleCategory: Category = {
     id: "cat1",
-    dhikrIds: [1],
     title: "سوره فاتحه",
     subtitle: "سوره اول قرآن",
     icon: () => null,
     color: "teal",
+    subcategories: [sampleSubcategory],
   };
   let progressData: {
     completedStages: { [dhikrId: number]: number };
@@ -52,6 +59,7 @@ describe("DhikrScreen FillGaps integration", () => {
     return render(
       <DhikrScreen
         category={sampleCategory}
+        subcategory={sampleSubcategory}
         progressData={progressData}
         onUpdateProgress={onUpdateProgress}
         onCompleteReview={onCompleteReview}
@@ -91,13 +99,20 @@ describe("DhikrScreen FillGaps integration", () => {
   });
 
   it("does not show bottom tab bar during dhikr/quiz", async () => {
-    const mockCategory = {
-      id: "cat1",
+    const mockSubcategory: Subcategory = {
+      id: "sub1",
+      title: "دسته تست",
+      subtitle: "",
       dhikrIds: [1],
+    };
+
+    const mockCategory: Category = {
+      id: "cat1",
       title: "دسته تست",
       subtitle: "",
       icon: () => null,
       color: "teal",
+      subcategories: [mockSubcategory],
     };
     const mockProgress = {
       completedStages: {},
@@ -108,6 +123,7 @@ describe("DhikrScreen FillGaps integration", () => {
     const { container } = render(
       <DhikrScreen
         category={mockCategory}
+        subcategory={mockSubcategory}
         progressData={mockProgress}
         onUpdateProgress={noop}
         onCompleteReview={noop}
