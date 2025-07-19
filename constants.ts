@@ -1,5 +1,11 @@
 import type { Dhikr, Category } from "./types";
-import { SunIcon, MoonIcon, BedIcon, MosqueIcon } from "./components/icons";
+import {
+  SunIcon,
+  MoonIcon,
+  BedIcon,
+  MosqueIcon,
+  PrayerIcon,
+} from "./components/icons";
 
 // Using official IDs from HisnMuslim.com to ensure 100% accurate mapping between text and audio.
 export const ALL_DHIKR: Dhikr[] = [
@@ -7,6 +13,7 @@ export const ALL_DHIKR: Dhikr[] = [
   {
     id: 83,
     categoryId: "morning-evening",
+    subcategoryId: "morning",
     arabic:
       "أَصْبَحْنَا وَأَصْبَحَ الْمُلْكُ لِلَّهِ، وَالْحَمْدُ لِلَّهِ، لَا إِلَهَ إِلَّا اللهُ وَحْدَهُ لَا شَرِيكَ لَهُ، لَهُ الْمُلْكُ وَلَهُ الْحَمْدُ وَهُوَ عَلَى كُلِّ شَيْءٍ قَدِيرٌ. رَبِّ أَسْأَلُكَ خَيْرَ مَا فِي هَذَا الْيَوْمِ وَخَيْرَ مَا بَعْدَهُ، وَأَعُوذُ بِكَ مِنْ شَرِّ مَا فِي هَذَا الْيَوْمِ وَشَرِّ مَا بَعْدَهُ، رَبِّ أَعُوذُ بِكَ مِنَ الْكَسَلِ وَسُوءِ الْكِبَرِ، رَبِّ أَعُوذُ بِكَ مِنْ عَذَابٍ فِي النَّارِ وَعَذَابٍ فِي الْقَبْرِ.",
     translation:
@@ -19,7 +26,7 @@ export const ALL_DHIKR: Dhikr[] = [
     transliteration: "Aṣbaḥnā wa aṣbaḥal-mulku lillāh...",
     virtue:
       "این ذکر در هنگام صبح گفته می‌شود. در هنگام شام «أَصْبَحْنَا» به «أَمْسَيْنَا» و «هَذَا الْيَوْمِ» به «هَذِهِ اللَّيْلَةِ» تغییر می‌کند.",
-    audioUrl: "https://hisnmuslim.com/audio/ar/77.mp3",
+    audioUrl: "https://www.hisnmuslim.com/audio/ar/77.mp3",
     points: 10,
     scrambleChunks: [
       "أَصْبَحْنَا وَأَصْبَحَ الْمُلْكُ لِلَّهِ،",
@@ -37,6 +44,7 @@ export const ALL_DHIKR: Dhikr[] = [
   {
     id: 86,
     categoryId: "morning-evening", // CORRECT ID FOR THIS DHIKR
+    subcategoryId: "evening",
     arabic:
       "أَمْسَيْنَا وَأَمْسَى الْمُلْكُ لِلَّهِ، وَالْحَمْدُ لِلَّهِ، لَا إِلَهَ إِلَّا اللهُ وَحْدَهُ لَا شَرِيكَ لَهُ، لَهُ الْمُلْكُ وَلَهُ الْحَمْدُ وَهُوَ عَلَى كُلِّ شَيْءٍ قَدِيرٌ. رَبِّ أَسْأَلُكَ خَيْرَ مَا فِي هَذِهِ اللَّيْلَةِ وَخَيْرَ مَا بَعْدَهَا، وَأَعُوذُ بِكَ مِنْ شَرِّ مَا فِي هَذِهِ اللَّيْلَةِ وَشَرِّ مَا بَعْدَهَا، رَبِّ أَعُوذُ بِكَ مِنَ الْكَسَلِ وَسُوءِ الْكِبَرِ، رَبِّ أَعُوذُ بِكَ مِنْ عَذَابٍ فِي النَّارِ وَعَذَابٍ فِي الْقَبْرِ.",
     translation:
@@ -48,7 +56,7 @@ export const ALL_DHIKR: Dhikr[] = [
     ],
     transliteration: "Amsaynā wa amsal-mulku lillāh...",
     virtue: "این ذکر هنگام شام گفته می‌شود و مشابه ذکر صبح است.",
-    audioUrl: "https://hisnmuslim.com/audio/ar/78.mp3", // CORRECT AUDIO URL
+    audioUrl: "https://www.hisnmuslim.com/audio/ar/78.mp3",
     points: 10,
     scrambleChunks: [
       "أَمْسَيْنَا وَأَمْسَى الْمُلْكُ لِلَّهِ،",
@@ -66,6 +74,7 @@ export const ALL_DHIKR: Dhikr[] = [
   {
     id: 97,
     categoryId: "morning-evening",
+    subcategoryId: "morning",
     arabic:
       "بِسْمِ اللهِ الَّذِي لَا يَضُرُّ مَعَ اسْمِهِ شَيْءٌ فِي الْأَرْضِ وَلَا فِي السَّمَاءِ وَهُوَ السَّمِيعُ الْعَلِيمُ.",
     translation:
@@ -79,12 +88,13 @@ export const ALL_DHIKR: Dhikr[] = [
       "Bismillāhil-ladhī lā yaḍurru ma`as-mihi shay’un fil-arḍi wa lā fis-samā’i wa huwas-samī`ul-`alīm.",
     virtue:
       "هر کس آن را سه بار در صبح و سه بار در شام بخواند، هيچ چيزى به او ضرر نمى‌رساند.",
-    audioUrl: "https://hisnmuslim.com/audio/ar/86.mp3",
+    audioUrl: "https://www.hisnmuslim.com/audio/ar/86.mp3",
     points: 10,
   },
   {
     id: 82,
     categoryId: "morning-evening-sleep",
+    subcategoryId: "shared",
     arabic:
       "اللَّهُ لَا إِلَٰهَ إِلَّا هُوَ الْحَيُّ الْقَيُّومُ ۚ لَا تَأْخُذُهُ سِنَةٌ وَلَا نَوْمٌ ۚ لَهُ مَا فِي السَّمَاوَاتِ وَمَا فِي الْأَرْضِ ۗ مَنْ ذَا الَّذِي يَشْفَعُ عِنْدَهُ إِلَّا بِإِذْنِهِ ۚ يَعْلَمُ مَا بَيْنَ أَيْدِيهِمْ وَمَا خَلْفَهُمْ ۖ وَلَا يُحِيطُونَ بِشَيْءٍ مِنْ عِلْمِهِ إِلَّا بِمَا شَاءَ ۚ وَسِعَ كُرْسِيُّهُ السَّمَاوَاتِ وَالْأَرْضَ ۖ وَلَا يَئُودُهُ حِفْظُهُمَا ۚ وَهُوَ الْعَلِيُّ الْعَظِيمُ.",
     translation:
@@ -97,7 +107,7 @@ export const ALL_DHIKR: Dhikr[] = [
     transliteration: "Allāhu lā ilāha illā huwal-ḥayyul-qayyūm...",
     virtue:
       "هر کس آن را هنگام صبح بخواند، تا شام از شر جنیان در امان مى‌ماند، و هر كس آن را هنگام شام بخواند، تا صبح از شر آنان در امان مى‌ماند.",
-    audioUrl: "https://hisnmuslim.com/audio/ar/75.mp3",
+    audioUrl: "https://www.hisnmuslim.com/audio/ar/75.mp3",
     points: 25,
     scrambleChunks: [
       "اللَّهُ لَا إِلَٰهَ إِلَّا هُوَ الْحَيُّ الْقَيُّومُ ۚ",
@@ -114,6 +124,7 @@ export const ALL_DHIKR: Dhikr[] = [
   {
     id: 85,
     categoryId: "morning-evening-sleep",
+    subcategoryId: "shared",
     arabic:
       "بِسْمِ اللَّهِ الرَّحْمَٰنِ الرَّحِيمِ\nقُلْ هُوَ اللَّهُ أَحَدٌ ۞ اللَّهُ الصَّمَدُ ۞ لَمْ يَلِدْ وَلَمْ يُولَدْ ۞ وَلَمْ يَكُن لَّهُ كُفُوًا أَحَدٌ\n\nبِسْمِ اللَّهِ الرَّحْمَٰنِ الرَّحِيمِ\nقُلْ أَعُوذُ بِرَبِّ الْفَلَقِ ۞ مِن شَرِّ مَا خَلَقَ ۞ وَمِن شَرِّ غَاسِقٍ إِذَا وَقَبَ ۞ وَمِن شَرِّ النَّفَّاثَاتِ فِي الْعُقَدِ ۞ وَمِن شَرِّ حَاسِدٍ إِذَا حَسَدَ\n\nبِسْمِ اللَّهِ الرَّحْمَٰنِ الرَّحِيمِ\nقُلْ أَعُوذُ بِرَبِّ النَّاسِ ۞ مَلِكِ النَّاسِ ۞ إِلَٰهِ النَّاسِ ۞ مِن شَرِّ الْوَسْوَاسِ الْخَنَّاسِ ۞ الَّذِي يُوَسْوِسُ فِي صُدُورِ النَّاسِ ۞ مِنَ الْجِنَّةِ وَالنَّاسِ",
     translation:
@@ -127,7 +138,7 @@ export const ALL_DHIKR: Dhikr[] = [
       "Qul Huwallahu Ahad... Qul a`udhu birabbil-falaq... Qul a`udhu birabbin-nas...",
     virtue:
       "هر کس آن‌ها را سه بار در صبح و شام بخواند، او را از هر چيزى كفايت مى‌كنند. (همچنین قبل از خواب سه بار خوانده می‌شود).",
-    audioUrl: "https://hisnmuslim.com/audio/ar/76.mp3",
+    audioUrl: "https://www.hisnmuslim.com/audio/ar/76.mp3",
     points: 25,
     scrambleChunks: [
       "بِسْمِ اللَّهِ الرَّحْمَٰنِ الرَّحِيمِ\nقُلْ هُوَ اللَّهُ أَحَدٌ ۞ اللَّهُ الصَّمَدُ ۞ لَمْ يَلِدْ وَلَمْ يُولَدْ ۞ وَلَمْ يَكُن لَّهُ كُفُوًا أَحَدٌ",
@@ -138,6 +149,7 @@ export const ALL_DHIKR: Dhikr[] = [
   {
     id: 94,
     categoryId: "morning-evening",
+    subcategoryId: "morning",
     arabic:
       "اللَّهُمَّ أَنْتَ رَبِّی لا إِلَهَ إِلاَّ أَنْتَ، خَلَقْتَنِی وَأَنَا عَبْدُکَ، وَأَنَا عَلَی عَهْدِکَ وَوَعْدِکَ مَا اسْتَطَعْتُ، أَعُوذُ بِکَ مِنْ شَرِّ مَا صَنَعْتُ، أَبُوءُ لَکَ بِنِعْمَتِکَ عَلَیَّ، وَأَبُوءُ بِذَنْبِی فَاغْفِرْ لِی، فَإِنَّهُ لا یَغْفِرُ الذُّنُوبَ إِلاَّ أَنْتَ.",
     translation:
@@ -150,7 +162,7 @@ export const ALL_DHIKR: Dhikr[] = [
     transliteration: "Allāhumma anta rabbī lā ilāha illā ant...",
     virtue:
       "هر كس با یقین در روز بگوید و قبل از شب بمیرد، از اهل بهشت است و هر كس با یقین در شب بگوید و قبل از صبح بمیرد، از اهل بهشت است.",
-    audioUrl: "https://hisnmuslim.com/audio/ar/79.mp3",
+    audioUrl: "https://www.hisnmuslim.com/audio/ar/79.mp3",
     points: 30,
     scrambleChunks: [
       "اللَّهُمَّ أَنْتَ رَبِّی لا إِلَهَ إِلاَّ أَنْتَ،",
@@ -168,6 +180,7 @@ export const ALL_DHIKR: Dhikr[] = [
   {
     id: 121,
     categoryId: "after-prayer",
+    subcategoryId: "after-prayer-adhkar",
     arabic:
       "أَسْتَغْفِرُ اللهَ (ثَلَاثًا) اللَّهُمَّ أَنْتَ السَّلَامُ وَمِنْكَ السَّلَامُ، تَبَارَكْتَ يَا ذَا الْجَلَالِ وَالْإِكْرَامِ.",
     translation:
@@ -180,12 +193,13 @@ export const ALL_DHIKR: Dhikr[] = [
     transliteration:
       "Astaghfirullāh (thalāthan). Allāhumma antas-salāmu wa minkas-salām, tabārakta yā dhal-jalāli wal-ikrām.",
     virtue: "گفتن این ذکر بلافاصله بعد از سلام نماز سنت است.",
-    audioUrl: "https://hisnmuslim.com/audio/ar/66.mp3",
+    audioUrl: "https://www.hisnmuslim.com/audio/ar/66.mp3",
     points: 10,
   },
   {
     id: 122,
     categoryId: "after-prayer",
+    subcategoryId: "after-prayer-adhkar",
     arabic:
       "سُبْحَانَ اللَّهِ (33 مرة)، الْحَمْدُ لِلَّهِ (33 مرة)، اللَّهُ أَكْبَرُ (33 مرة)، ثُمَّ يَقُولُ تَمَامَ الْمِائَةِ: لَا إِلَهَ إِلَّا اللَّهُ وَحْدَهُ لَا شَرِيكَ لَهُ، لَهُ الْمُلْكُ وَلَهُ الْحَمْدُ وَهُوَ عَلَى كُلِّ شَيْءٍ قَدِيرٌ.",
     translation:
@@ -199,7 +213,7 @@ export const ALL_DHIKR: Dhikr[] = [
       "Subḥānallāh (33 marrah), Alḥamdulillāh (33 marrah), Allāhu akbar (33 marrah)...",
     virtue:
       "هر کس بعد از هر نماز این را بگوید، گناهانش آمرزیده می‌شود، اگرچه به اندازه کف دریا باشد.",
-    audioUrl: "https://hisnmuslim.com/audio/ar/69.mp3",
+    audioUrl: "https://www.hisnmuslim.com/audio/ar/69.mp3",
     points: 25,
     scrambleChunks: [
       "سُبْحَانَ اللَّهِ (33 مرة)،",
@@ -216,6 +230,7 @@ export const ALL_DHIKR: Dhikr[] = [
   {
     id: 110,
     categoryId: "sleep",
+    subcategoryId: "sleep-adhkar",
     arabic:
       "بِاسْمِكَ رَبِّي وَضَعْتُ جَنْبِي، وَبِكَ أَرْفَعُهُ، فَإِنْ أَمْسَكْتَ نَفْسِي فَارْحَمْهَا، وَإِنْ أَرْسَلْتَهَا فَاحْفَظْهَا بِمَا تَحْفَظُ بِهِ عِبَادَكَ الصَّالِحِينَ.",
     translation:
@@ -227,12 +242,13 @@ export const ALL_DHIKR: Dhikr[] = [
     ],
     transliteration: "Bismika rabbī waḍa`tu janbī, wa bika arfa`uh...",
     virtue: "هنگام خوابیدن این ذکر را بخوانید.",
-    audioUrl: "https://hisnmuslim.com/audio/ar/102.mp3",
+    audioUrl: "https://www.hisnmuslim.com/audio/ar/102.mp3",
     points: 10,
   },
   {
     id: 111,
     categoryId: "sleep",
+    subcategoryId: "sleep-adhkar",
     arabic: "اللَّهُمَّ قِنِي عَذَابَكَ يَوْمَ تَبْعَثُ عِبَادَكَ.",
     translation:
       "خداوندا! روزی که بندگانت را برمی‌انگیزی، مرا از عذابت حفظ کن.",
@@ -244,8 +260,230 @@ export const ALL_DHIKR: Dhikr[] = [
     transliteration: "Allāhumma qinī `adhābaka yawma tab`athu `ibādak.",
     virtue:
       "پیامبر (ص) هنگام خواب دست راستشان را زیر گونه راست می‌گذاشتند و این دعا را (سه بار) می‌خواندند.",
-    audioUrl: "https://hisnmuslim.com/audio/ar/104.mp3",
+    audioUrl: "https://www.hisnmuslim.com/audio/ar/104.mp3",
     points: 10,
+  },
+  // --- During Prayer ---
+  {
+    id: 130,
+    categoryId: "during-prayer",
+    subcategoryId: "istiftah",
+    arabic:
+      "سُبْحَانَكَ اللَّهُمَّ وَبِحَمْدِكَ، وَتَبَارَكَ اسْمُكَ، وَتَعَالَى جَدُّكَ، وَلَا إِلَهَ غَيْرُكَ.",
+    translation:
+      "پاک و منزه هستی ای خداوند! و ستایش از آنِ توست، و نام تو پربرکت است، و بزرگی تو والا و برتر است، و هیچ معبودی جز تو نیست.",
+    distractorTranslations: [
+      "پاک و منزه هستی ای خداوند! و ستایش از آنِ من است.",
+      "پاک و منزه هستی ای خداوند! و نام تو کوچک است.",
+      "پاک و منزه هستی ای خداوند! و بزرگی تو پایین است.",
+    ],
+    transliteration:
+      "Subḥānakallāhumma wa biḥamdik, wa tabārakas-muk, wa ta`ālā jadduk, wa lā ilāha ghayruk.",
+    virtue: "این ذکر در ابتدای نماز (استفتاح) گفته می‌شود.",
+    audioUrl: "https://www.hisnmuslim.com/audio/ar/28.mp3",
+    points: 15,
+    scrambleChunks: [
+      "سُبْحَانَكَ اللَّهُمَّ وَبِحَمْدِكَ،",
+      "وَتَبَارَكَ اسْمُكَ،",
+      "وَتَعَالَى جَدُّكَ،",
+      "وَلَا إِلَهَ غَيْرُكَ.",
+    ],
+  },
+  {
+    id: 131,
+    categoryId: "during-prayer",
+    subcategoryId: "sujood",
+    arabic: "سُبْحَانَ رَبِّيَ الْأَعْلَى.",
+    translation: "پاک و منزه است پروردگار من که برتر است.",
+    distractorTranslations: [
+      "پاک و منزه است پروردگار من که پایین است.",
+      "پاک و منزه است بنده من که برتر است.",
+      "پاک و منزه است پروردگار تو که برتر است.",
+    ],
+    transliteration: "Subḥāna rabbiyal-a`lā.",
+    virtue: "این ذکر در سجده نماز گفته می‌شود.",
+    audioUrl: "https://www.hisnmuslim.com/audio/ar/41.mp3",
+    points: 10,
+  },
+  {
+    id: 141,
+    categoryId: "during-prayer",
+    subcategoryId: "sujood",
+    arabic:
+      "سُبْحَانَكَ اللَّهُمَّ رَبَّنَا وَبِحَمْدِكَ، اللَّهُمَّ اغْفِرْ لِي.",
+    translation:
+      "پاک و منزه هستی ای خداوند ما و ستایش از آنِ توست، خداوندا! مرا بیامرز.",
+    distractorTranslations: [
+      "پاک و منزه هستی ای خداوند ما و ستایش از آنِ من است.",
+      "پاک و منزه هستی ای خداوند ما و ستایش از آنِ ماست.",
+      "پاک و منزه هستی ای خداوند ما و ستایش از آنِ تو نیست.",
+    ],
+    transliteration:
+      "Subḥānakallāhumma rabbanā wa biḥamdik, allāhumma-ghfir lī.",
+    virtue: "این ذکر در سجده نماز گفته می‌شود.",
+    audioUrl: "https://www.hisnmuslim.com/audio/ar/42.mp3",
+    points: 12,
+  },
+  {
+    id: 132,
+    categoryId: "during-prayer",
+    subcategoryId: "ruku",
+    arabic: "سُبْحَانَ رَبِّيَ الْعَظِيمِ.",
+    translation: "پاک و منزه است پروردگار من که بزرگ است.",
+    distractorTranslations: [
+      "پاک و منزه است پروردگار من که کوچک است.",
+      "پاک و منزه است بنده من که بزرگ است.",
+      "پاک و منزه است پروردگار تو که بزرگ است.",
+    ],
+    transliteration: "Subḥāna rabbiyal-`aẓīm.",
+    virtue: "این ذکر در رکوع نماز گفته می‌شود.",
+    audioUrl: "https://www.hisnmuslim.com/audio/ar/33.mp3",
+    points: 10,
+  },
+  {
+    id: 133,
+    categoryId: "during-prayer",
+    subcategoryId: "between-sujood",
+    arabic: "رَبِّ اغْفِرْ لِي.",
+    translation: "پروردگارا! مرا بیامرز.",
+    distractorTranslations: [
+      "پروردگارا! مرا عذاب کن.",
+      "پروردگارا! مرا ببخش.",
+      "پروردگارا! مرا کمک کن.",
+    ],
+    transliteration: "Rabbighfir lī.",
+    virtue: "این ذکر بین دو سجده گفته می‌شود.",
+    audioUrl: "https://www.hisnmuslim.com/audio/ar/48.mp3",
+    points: 8,
+  },
+  {
+    id: 134,
+    categoryId: "during-prayer",
+    subcategoryId: "tashahhud",
+    arabic:
+      "اللَّهُمَّ صَلِّ عَلَى مُحَمَّدٍ وَعَلَى آلِ مُحَمَّدٍ، كَمَا صَلَّيْتَ عَلَى إِبْرَاهِيمَ وَعَلَى آلِ إِبْرَاهِيمَ، إِنَّكَ حَمِيدٌ مَجِيدٌ.",
+    translation:
+      "خداوندا! بر محمد و خاندان محمد درود فرست، چنانکه بر ابراهیم و خاندان ابراهیم درود فرستادی، همانا تو ستوده و بزرگوار هستی.",
+    distractorTranslations: [
+      "خداوندا! بر محمد و خاندان محمد درود فرست، چنانکه بر موسی درود فرستادی.",
+      "خداوندا! بر محمد درود فرست، چنانکه بر ابراهیم درود فرستادی.",
+      "خداوندا! بر محمد و خاندان محمد درود فرست، چنانکه بر عیسی درود فرستادی.",
+    ],
+    transliteration:
+      "Allāhumma ṣalli `alā muḥammadin wa `alā āli muḥammad, kamā ṣallayta `alā ibrāhīma wa `alā āli ibrāhīm, innaka ḥamīdun majīd.",
+    virtue: "این ذکر در تشهد نماز گفته می‌شود.",
+    audioUrl: "https://www.hisnmuslim.com/audio/ar/53.mp3",
+    points: 20,
+    scrambleChunks: [
+      "اللَّهُمَّ صَلِّ عَلَى مُحَمَّدٍ وَعَلَى آلِ مُحَمَّدٍ،",
+      "كَمَا صَلَّيْتَ عَلَى إِبْرَاهِيمَ وَعَلَى آلِ إِبْرَاهِيمَ،",
+      "إِنَّكَ حَمِيدٌ مَجِيدٌ.",
+    ],
+  },
+  {
+    id: 135,
+    categoryId: "during-prayer",
+    subcategoryId: "tashahhud",
+    arabic:
+      "اللَّهُمَّ بَارِكْ عَلَى مُحَمَّدٍ وَعَلَى آلِ مُحَمَّدٍ، كَمَا بَارَكْتَ عَلَى إِبْرَاهِيمَ وَعَلَى آلِ إِبْرَاهِيمَ، إِنَّكَ حَمِيدٌ مَجِيدٌ.",
+    translation:
+      "خداوندا! بر محمد و خاندان محمد برکت فرست، چنانکه بر ابراهیم و خاندان ابراهیم برکت فرستادی، همانا تو ستوده و بزرگوار هستی.",
+    distractorTranslations: [
+      "خداوندا! بر محمد و خاندان محمد برکت فرست، چنانکه بر موسی برکت فرستادی.",
+      "خداوندا! بر محمد برکت فرست، چنانکه بر ابراهیم برکت فرستادی.",
+      "خداوندا! بر محمد و خاندان محمد برکت فرست، چنانکه بر عیسی برکت فرستادی.",
+    ],
+    transliteration:
+      "Allāhumma bārik `alā muḥammadin wa `alā āli muḥammad, kamā bārakta `alā ibrāhīma wa `alā āli ibrāhīm, innaka ḥamīdun majīd.",
+    virtue: "این ذکر در تشهد نماز گفته می‌شود.",
+    audioUrl: "https://www.hisnmuslim.com/audio/ar/40.mp3",
+    points: 20,
+    scrambleChunks: [
+      "اللَّهُمَّ بَارِكْ عَلَى مُحَمَّدٍ وَعَلَى آلِ مُحَمَّدٍ،",
+      "كَمَا بَارَكْتَ عَلَى إِبْرَاهِيمَ وَعَلَى آلِ إِبْرَاهِيمَ،",
+      "إِنَّكَ حَمِيدٌ مَجِيدٌ.",
+    ],
+  },
+  {
+    id: 136,
+    categoryId: "during-prayer",
+    subcategoryId: "rising-from-ruku",
+    arabic: "سَمِعَ اللَّهُ لِمَنْ حَمِدَهُ.",
+    translation: "خداوند دعای کسی که او را ستایش کرد، شنید.",
+    distractorTranslations: [
+      "خداوند دعای کسی که او را ستایش نکرد، شنید.",
+      "خداوند دعای کسی که او را ستایش کرد، نشنید.",
+      "خداوند دعای همه را شنید.",
+    ],
+    transliteration: "Sami`allāhu liman ḥamidah.",
+    virtue: "این ذکر هنگام برخاستن از رکوع گفته می‌شود.",
+    audioUrl: "https://www.hisnmuslim.com/audio/ar/38.mp3",
+    points: 12,
+  },
+  {
+    id: 137,
+    categoryId: "during-prayer",
+    subcategoryId: "rising-from-ruku",
+    arabic: "رَبَّنَا وَلَكَ الْحَمْدُ.",
+    translation: "پروردگارا! و ستایش از آنِ توست.",
+    distractorTranslations: [
+      "پروردگارا! و ستایش از آنِ من است.",
+      "پروردگارا! و ستایش از آنِ ماست.",
+      "پروردگارا! و ستایش از آنِ تو نیست.",
+    ],
+    transliteration: "Rabbana wa lakal-ḥamd.",
+    virtue: "این ذکر بعد از برخاستن از رکوع گفته می‌شود.",
+    audioUrl: "https://www.hisnmuslim.com/audio/ar/39.mp3",
+    points: 10,
+  },
+  {
+    id: 138,
+    categoryId: "during-prayer",
+    subcategoryId: "before-salam",
+    arabic:
+      "اللَّهُمَّ إِنِّي أَعُوذُ بِكَ مِنْ عَذَابِ الْقَبْرِ، وَمِنْ عَذَابِ النَّارِ، وَمِنْ فِتْنَةِ الْمَحْيَا وَالْمَمَاتِ، وَمِنْ شَرِّ فِتْنَةِ الْمَسِيحِ الدَّجَّالِ.",
+    translation:
+      "خداوندا! من از عذاب قبر، و از عذاب آتش، و از فتنه زندگی و مرگ، و از شر فتنه مسیح دجال به تو پناه می‌برم.",
+    distractorTranslations: [
+      "خداوندا! من از عذاب قبر و آتش به تو پناه می‌برم.",
+      "خداوندا! من از فتنه زندگی به تو پناه می‌برم.",
+      "خداوندا! من از شر دجال به تو پناه می‌برم.",
+    ],
+    transliteration:
+      "Allāhumma innī a`ūdhu bika min `adhābil-qabr, wa min `adhābin-nār, wa min fitnatil-maḥyā wal-mamāt, wa min sharri fitnatil-masīḥid-dajjāl.",
+    virtue: "این دعا در تشهد آخر نماز گفته می‌شود.",
+    audioUrl: "https://www.hisnmuslim.com/audio/ar/55.mp3",
+    points: 25,
+    scrambleChunks: [
+      "اللَّهُمَّ إِنِّي أَعُوذُ بِكَ مِنْ عَذَابِ الْقَبْرِ،",
+      "وَمِنْ عَذَابِ النَّارِ،",
+      "وَمِنْ فِتْنَةِ الْمَحْيَا وَالْمَمَاتِ،",
+      "وَمِنْ شَرِّ فِتْنَةِ الْمَسِيحِ الدَّجَّالِ.",
+    ],
+  },
+  {
+    id: 139,
+    categoryId: "during-prayer",
+    subcategoryId: "before-salam",
+    arabic:
+      "رَبَّنَا آتِنَا فِي الدُّنْيَا حَسَنَةً وَفِي الْآخِرَةِ حَسَنَةً وَقِنَا عَذَابَ النَّارِ.",
+    translation:
+      "پروردگارا! در دنیا به ما نیکی عطا کن و در آخرت نیز نیکی عطا کن و ما را از عذاب آتش حفظ کن.",
+    distractorTranslations: [
+      "پروردگارا! در دنیا به ما نیکی عطا کن.",
+      "پروردگارا! در آخرت به ما نیکی عطا کن.",
+      "پروردگارا! ما را از عذاب آتش حفظ کن.",
+    ],
+    transliteration:
+      "Rabbana ātinā fid-dunyā ḥasanatan wa fil-ākhirati ḥasanatan wa qinā `adhāban-nār.",
+    virtue: "این دعا در تشهد آخر نماز گفته می‌شود.",
+    audioUrl: "https://www.hisnmuslim.com/audio/ar/56.mp3",
+    points: 20,
+    scrambleChunks: [
+      "رَبَّنَا آتِنَا فِي الدُّنْيَا حَسَنَةً",
+      "وَفِي الْآخِرَةِ حَسَنَةً",
+      "وَقِنَا عَذَابَ النَّارِ.",
+    ],
   },
 ];
 
@@ -256,7 +494,20 @@ export const CATEGORIES: Category[] = [
     subtitle: "شروع روز با یاد خدا",
     icon: SunIcon,
     color: "text-yellow-500",
-    dhikrIds: [97, 83, "review-m1", 94, 82, 85],
+    subcategories: [
+      {
+        id: "morning-adhkar",
+        title: "اذکار صبح",
+        subtitle: "ذکرهای شروع روز",
+        dhikrIds: [97, 83, 94],
+      },
+      {
+        id: "morning-shared",
+        title: "اذکار مشترک",
+        subtitle: "اذکار مشترک صبح و شب",
+        dhikrIds: [82, 85],
+      },
+    ],
   },
   {
     id: "evening",
@@ -264,7 +515,20 @@ export const CATEGORIES: Category[] = [
     subtitle: "آرامش در پایان روز",
     icon: MoonIcon,
     color: "text-indigo-400",
-    dhikrIds: [97, 86, "review-e1", 94, 82, 85], // CORRECTED: Using ID 86 for evening
+    subcategories: [
+      {
+        id: "evening-adhkar",
+        title: "اذکار شب",
+        subtitle: "ذکرهای پایان روز",
+        dhikrIds: [97, 86, 94],
+      },
+      {
+        id: "evening-shared",
+        title: "اذکار مشترک",
+        subtitle: "اذکار مشترک صبح و شب",
+        dhikrIds: [82, 85],
+      },
+    ],
   },
   {
     id: "after-prayer",
@@ -272,7 +536,14 @@ export const CATEGORIES: Category[] = [
     subtitle: "تعقیبات نمازهای فرض",
     icon: MosqueIcon,
     color: "text-green-500",
-    dhikrIds: [121, 122, 82, 85],
+    subcategories: [
+      {
+        id: "after-prayer-adhkar",
+        title: "اذکار بعد از نماز",
+        subtitle: "تعقیبات و ذکرهای بعد از نماز",
+        dhikrIds: [121, 122],
+      },
+    ],
   },
   {
     id: "sleep",
@@ -280,6 +551,64 @@ export const CATEGORIES: Category[] = [
     subtitle: "خوابی آرام در پناه او",
     icon: BedIcon,
     color: "text-blue-500",
-    dhikrIds: [111, 110, "review-s1", 82, 85],
+    subcategories: [
+      {
+        id: "sleep-adhkar",
+        title: "اذکار خواب",
+        subtitle: "ذکرهای قبل از خواب",
+        dhikrIds: [111, 110],
+      },
+    ],
+  },
+  {
+    id: "during-prayer",
+    title: "اذکار هنگام نماز",
+    subtitle: "ذکرهای مختلف در نماز",
+    icon: PrayerIcon,
+    color: "text-purple-500",
+    subcategories: [
+      {
+        id: "istiftah",
+        title: "دعاهای استفتاح",
+        subtitle: "دعاهای بعد از تکبیر تحریمه و قبل از فاتحه",
+        dhikrIds: [130],
+      },
+      {
+        id: "ruku",
+        title: "دعای رکوع",
+        subtitle: "اذکار و دعاهای رکوع",
+        dhikrIds: [132],
+      },
+      {
+        id: "rising-from-ruku",
+        title: "دعای هنگام برخاستن از رکوع",
+        subtitle: "اذکار هنگام برخاستن از رکوع",
+        dhikrIds: [136, 137],
+      },
+      {
+        id: "sujood",
+        title: "دعای سجده",
+        subtitle: "اذکار و دعاهای سجده",
+        dhikrIds: [131, 141],
+      },
+      {
+        id: "between-sujood",
+        title: "دعای نشستن در میان دو سجده",
+        subtitle: "اذکار بین دو سجده",
+        dhikrIds: [133],
+      },
+      {
+        id: "tashahhud",
+        title: "تشهد",
+        subtitle: "اذکار تشهد و صلوات",
+        dhikrIds: [134, 135],
+      },
+      {
+        id: "before-salam",
+        title: "دعای بعد از تشهد آخر و قبل از سلام",
+        subtitle: "دعاهای محافظت و خیر",
+        dhikrIds: [138, 139],
+      },
+    ],
   },
 ];
