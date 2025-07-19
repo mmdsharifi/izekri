@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useMemo } from "react";
-import type { Category, Dhikr } from "../types";
+import type { Category, Subcategory, Dhikr } from "../types";
 import { ALL_DHIKR } from "../constants";
 import {
   CheckCircleIcon,
@@ -16,6 +16,7 @@ import StageFillGaps from "./DhikrScreen/StageFillGaps";
 
 interface DhikrScreenProps {
   category: Category;
+  subcategory: Subcategory;
   onBack: () => void;
   progressData: {
     completedStages: { [dhikrId: number]: number };
@@ -33,6 +34,7 @@ interface DhikrScreenProps {
   setHeaderStageIndex?: (n: number) => void;
   setHeaderTotalStages?: (n: number) => void;
   setHeaderItemIndex?: (n: number) => void;
+  isReviewMode?: boolean;
 }
 
 const shuffleArray = <T,>(array: T[]): T[] => {
@@ -258,6 +260,7 @@ const ReviewMode = ({
 
 export default function DhikrScreen({
   category,
+  subcategory,
   onBack,
   progressData,
   onUpdateProgress,
@@ -267,6 +270,7 @@ export default function DhikrScreen({
   setHeaderTotalStages,
   setHeaderItemIndex,
   onFooterControlsChange, // تابع جدید برای ارسال کنترل‌ها به App
+  isReviewMode = false,
 }: DhikrScreenProps & { onFooterControlsChange?: (controls: any) => void }) {
   const [itemIndex, setItemIndex] = useState(0);
   const [stageIndex, setStageIndex] = useState(0);
@@ -290,7 +294,7 @@ export default function DhikrScreen({
     options: string[];
     filled: (string | null)[];
   }>({ words: [], hiddenIndices: [], options: [], filled: [] });
-  const categoryItems = useMemo(() => category.dhikrIds, [category.id]);
+  const categoryItems = useMemo(() => subcategory.dhikrIds, [subcategory.id]);
   const currentItem = useMemo(
     () => categoryItems[itemIndex],
     [categoryItems, itemIndex]
@@ -638,7 +642,21 @@ export default function DhikrScreen({
 
   // Remove all early returns and use a single content variable
   let content = null;
-  if (showSummary) {
+
+  // Handle review mode
+  if (isReviewMode) {
+    const reviewDhikrIds = subcategory.dhikrIds.filter(
+      (id) => typeof id === "number"
+    ) as number[];
+    const dhikrsToReview = ALL_DHIKR.filter((d) =>
+      reviewDhikrIds.includes(d.id)
+    );
+    content = (
+      <div className="p-4 sm:p-6 min-h-[calc(100vh-68px)] flex flex-col">
+        <ReviewMode dhikrsToReview={dhikrsToReview} onComplete={onBack} />
+      </div>
+    );
+  } else if (showSummary) {
     content = (
       <CategorySummaryView
         score={progressData.score}
@@ -653,7 +671,7 @@ export default function DhikrScreen({
       </div>
     );
   } else if (typeof currentItem === "string") {
-    const reviewDhikrIds = category.dhikrIds
+    const reviewDhikrIds = subcategory.dhikrIds
       .slice(0, itemIndex)
       .filter((id) => typeof id === "number") as number[];
     const dhikrsToReview = ALL_DHIKR.filter((d) =>
