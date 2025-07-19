@@ -1,0 +1,64 @@
+---
+alwaysApply: true
+description: Guide for using Hisnul Muslim API to fetch adhkar data and audio URLs
+---
+
+# Hisnul Muslim API Integration Guide
+
+## API Endpoint
+Use the main API endpoint to get all categories: `https://www.hisnmuslim.com/api/ar/husn_ar.json`
+
+## Data Structure
+The API response contains an array of categories with the following structure:
+```json
+{
+  "العربية": [
+    {
+      "ID": number,
+      "TITLE": "Category Title in Arabic",
+      "AUDIO_URL": "http://www.hisnmuslim.com/audio/ar/ar_7esn_AlMoslem_by_Doors_XXX.mp3",
+      "TEXT": "http://www.hisnmuslim.com/api/ar/{ID}.json"
+    }
+  ]
+}
+```
+
+## Implementation Steps
+
+### 1. Fetch Top-Level Categories
+Use the main API endpoint to get all categories. These represent the main sections of Hisnul Muslim.
+
+### 2. Fetch Individual Adhkar for Each Category
+For each category, use the `TEXT` property URL to fetch the specific adhkar within that category:
+- URL format: `http://www.hisnmuslim.com/api/ar/{ID}.json`
+- This returns the list of individual adhkar for that category
+
+### 3. Audio URL Mapping
+- **For categories**: Use the `AUDIO_URL` from the main API response
+- **For individual adhkar**: Use the audio URL from the category's TEXT endpoint response
+
+## Example Usage
+
+```typescript
+// 1. Fetch main categories
+const mainResponse = await fetch('https://www.hisnmuslim.com/api/ar/husn_ar.json');
+const mainData = await mainResponse.json();
+
+// 2. For each category, fetch its adhkar
+for (const category of mainData.العربية) {
+  const adhkarResponse = await fetch(category.TEXT);
+  const adhkarData = await adhkarResponse.json();
+  
+  // Process individual adhkar with their audio URLs
+  // adhkarData will contain the list of adhkar for this category
+}
+```
+
+## Important Notes
+- Always use the `AUDIO_URL` from the API responses, not hardcoded URLs
+- The audio files follow the pattern: `ar_7esn_AlMoslem_by_Doors_XXX.mp3`
+- Each category has its own set of adhkar that should be fetched separately
+- Update [constants.ts](mdc:constants.ts) with the correct audio URLs from the API responses
+
+## Current Implementation
+The current [constants.ts](mdc:constants.ts) file contains hardcoded audio URLs that should be replaced with the correct URLs from the API responses.

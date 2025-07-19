@@ -1,0 +1,113 @@
+# Audio URL Verification Testing & TDD Approach
+
+## Overview
+
+This project requires rigorous testing of audio URLs to ensure they match the official Hisnul Muslim API. All new features must follow Test-Driven Development (TDD) approach.
+
+## Core Testing Principles
+
+### 1. Audio URL Verification
+
+- **Test File**: [tests/audio-url-verification.test.ts](mdc:tests/audio-url-verification.test.ts)
+- **Purpose**: Verify all audio URLs in [constants.ts](mdc:constants.ts) match their Arabic text from the official API
+- **API Endpoint**: `https://www.hisnmuslim.com/api/ar/{categoryId}.json`
+
+### 2. TDD Workflow
+
+1. **Write failing test first** - Define expected behavior
+2. **Write minimal code** - Make test pass
+3. **Refactor** - Improve code while keeping tests green
+4. **Repeat** - For each new feature
+
+### 3. Test Categories
+
+- **API Integration Tests**: Verify audio URLs against official API
+- **Format Validation**: Ensure correct URL pattern
+- **Uniqueness Tests**: No duplicate audio URLs
+- **Content Validation**: Non-empty Arabic text
+- **Specific Adhkar Tests**: Known adhkar verification
+
+## Audio URL Structure
+
+```typescript
+// Correct format
+"http://www.hisnmuslim.com/audio/ar/{ID}.mp3";
+
+// Examples
+"http://www.hisnmuslim.com/audio/ar/41.mp3"; // Sujood dhikr
+"http://www.hisnmuslim.com/audio/ar/33.mp3"; // Ruku dhikr
+"http://www.hisnmuslim.com/audio/ar/48.mp3"; // Between sujood dhikr
+```
+
+## API Category Mapping
+
+```typescript
+const categoryMapping = {
+  "wake-up": 1,
+  "morning-evening": 27,
+  sleep: 28,
+  "during-prayer": {
+    istiftah: 16,
+    ruku: 17,
+    "rising-from-ruku": 18,
+    sujood: 19,
+    "between-sujood": 20,
+    tashahhud: 22,
+    "prayer-on-prophet": 23,
+    "before-salam": 24,
+  },
+};
+```
+
+## Testing Commands
+
+```bash
+# Run audio URL verification tests
+npm test -- tests/audio-url-verification.test.ts
+
+# Run all tests
+npm test
+
+# Run tests in watch mode
+npm test -- --watch
+```
+
+## Required Test Coverage
+
+- ✅ All audio URLs match API responses
+- ✅ No duplicate audio URLs
+- ✅ Valid URL format
+- ✅ Non-empty Arabic text
+- ✅ Specific known adhkar verification
+- ✅ API response validation
+- ✅ Error handling for API failures
+
+## Integration Points
+
+- [constants.ts](mdc:constants.ts) - Contains ALL_DHIKR array
+- [types.ts](mdc:types.ts) - Contains Dhikr interface
+- [App.tsx](mdc:App.tsx) - Main application logic
+- [components/DhikrScreen.tsx](mdc:components/DhikrScreen.tsx) - Dhikr display component
+
+## Error Handling
+
+- Network failures during API calls
+- Invalid audio URL formats
+- Missing or incorrect Arabic text
+- Duplicate audio URLs
+- API response parsing errors
+
+## Best Practices
+
+1. **Always test audio URLs** when adding new adhkar
+2. **Use TDD approach** for all new features
+3. **Verify against official API** before committing
+4. **Handle API timeouts** (30-second timeout for API calls)
+5. **Clean Arabic text** for comparison (remove punctuation, normalize whitespace)
+6. **Extract audio IDs** from URLs for validation
+7. **Test specific known adhkar** as regression tests
+   description:
+   globs:
+   alwaysApply: false
+
+---
