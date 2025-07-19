@@ -3,11 +3,17 @@ import Header from "./components/Header";
 import Dashboard from "./components/Dashboard";
 import DhikrScreen from "./components/DhikrScreen";
 import AdhkarListScreen from "./components/AdhkarListScreen";
+import { SubcategoryList } from "./components/SubcategoryList";
 import { CATEGORIES, ALL_DHIKR } from "./constants";
-import type { Category, Progress } from "./types";
+import type { Category, Subcategory, Progress } from "./types";
 import { useAudio } from "./hooks/useAudio";
 import { StagewiseToolbar } from "@stagewise/toolbar-react";
 import ReactPlugin from "@stagewise-plugins/react";
+import {
+  registerServiceWorker,
+  setupNetworkMonitoring,
+} from "./utils/serviceWorker";
+import CacheManager from "./components/CacheManager";
 
 const defaultProgressValue = {
   completedStages: {},
@@ -18,6 +24,8 @@ const defaultProgressValue = {
 export default function App() {
   const [isDarkMode, setIsDarkMode] = useState(false);
   const [activeCategory, setActiveCategory] = useState<Category | null>(null);
+  const [activeSubcategory, setActiveSubcategory] =
+    useState<Subcategory | null>(null);
   const [sessionStartTime, setSessionStartTime] = useState<number | null>(null);
   const [progress, setProgress] = useState<Progress>(() => {
     try {
@@ -68,6 +76,9 @@ export default function App() {
   const [headerItemIndex, setHeaderItemIndex] = useState<number>(0);
   const [activeTab, setActiveTab] = useState<"home" | "adhkar">("home");
   const [footerControls, setFooterControls] = useState<any>(null);
+  const [isReviewMode, setIsReviewMode] = useState(false);
+  const [isOnline, setIsOnline] = useState(true);
+  const [showCacheManager, setShowCacheManager] = useState(false);
 
   // Set theme based on device preference on first load
   useEffect(() => {
@@ -76,6 +87,16 @@ export default function App() {
       window.matchMedia("(prefers-color-scheme: dark)").matches;
     setIsDarkMode(prefersDark);
     document.documentElement.classList.toggle("dark", prefersDark);
+  }, []);
+
+  // Register service worker and setup network monitoring
+  useEffect(() => {
+    registerServiceWorker();
+    const cleanup = setupNetworkMonitoring(
+      () => setIsOnline(true),
+      () => setIsOnline(false)
+    );
+    return cleanup;
   }, []);
 
   useEffect(() => {
@@ -108,13 +129,35 @@ export default function App() {
     const category = CATEGORIES.find((c) => c.id === categoryId);
     if (category) {
       setActiveCategory(category);
-      setSessionStartTime(Date.now());
+      setActiveSubcategory(null);
     }
+  };
+
+  const handleSelectSubcategory = (subcategory: Subcategory) => {
+    setActiveSubcategory(subcategory);
+    setSessionStartTime(Date.now());
+    setIsReviewMode(false);
+  };
+
+  const handleReviewModeSelect = (subcategory: Subcategory) => {
+    // For review mode, we'll use the same subcategory but mark it as review mode
+    // This will be handled in the DhikrScreen component
+    setActiveSubcategory(subcategory);
+    setSessionStartTime(Date.now());
+    setIsReviewMode(true);
   };
 
   const handleBackToDashboard = () => {
     setActiveCategory(null);
+    setActiveSubcategory(null);
     setSessionStartTime(null);
+    setIsReviewMode(false);
+  };
+
+  const handleBackToCategory = () => {
+    setActiveSubcategory(null);
+    setSessionStartTime(null);
+    setIsReviewMode(false);
   };
 
   const handleUpdateProgress = (
@@ -179,11 +222,19 @@ export default function App() {
         totalScore={
           activeCategory ? progress[activeCategory.id]?.score || 0 : totalScore
         }
-        categoryTitle={activeCategory ? activeCategory.title : undefined}
-        onBack={activeCategory ? handleBackToDashboard : undefined}
+        categoryTitle={
+          activeSubcategory ? activeSubcategory.title : activeCategory?.title
+        }
+        onBack={
+          activeSubcategory
+            ? handleBackToCategory
+            : activeCategory
+            ? handleBackToDashboard
+            : undefined
+        }
         progressPercent={(() => {
-          if (!activeCategory) return undefined;
-          const totalItems = activeCategory.dhikrIds.length;
+          if (!activeSubcategory) return undefined;
+          const totalItems = activeSubcategory.dhikrIds.length;
           return totalItems > 0 ? (headerItemIndex / totalItems) * 100 : 0;
         })()}
         stageIndex={headerStageIndex}
@@ -191,12 +242,13 @@ export default function App() {
       />
       <div className="flex-1 w-full">
         {activeTab === "home" ? (
-          activeCategory ? (
+          activeSubcategory ? (
             <DhikrScreen
-              category={activeCategory}
-              onBack={handleBackToDashboard}
+              category={activeCategory!}
+              subcategory={activeSubcategory}
+              onBack={handleBackToCategory}
               progressData={
-                progress[activeCategory.id] || { ...defaultProgressValue }
+                progress[activeCategory!.id] || { ...defaultProgressValue }
               }
               onUpdateProgress={handleUpdateProgress}
               onCompleteReview={handleCompleteReview}
@@ -205,6 +257,14 @@ export default function App() {
               setHeaderTotalStages={setHeaderTotalStages}
               setHeaderItemIndex={setHeaderItemIndex}
               onFooterControlsChange={setFooterControls}
+              isReviewMode={isReviewMode}
+            />
+          ) : activeCategory ? (
+            <SubcategoryList
+              category={activeCategory}
+              onSubcategorySelect={handleSelectSubcategory}
+              onReviewModeSelect={handleReviewModeSelect}
+              progress={progress}
             />
           ) : (
             <Dashboard
@@ -277,6 +337,63 @@ export default function App() {
           </button>
         </nav>
       )}
+      {/* Network Status Indicator - Only in development */}
+      {process.env.NODE_ENV === "development" && !isOnline && (
+        <div className="fixed top-20 left-4 right-4 z-50 bg-yellow-500 text-white px-4 py-2 rounded-lg shadow-lg text-center text-sm">
+          حالت آفلاین - فایل‌های ذخیره شده در دسترس هستند
+        </div>
+      )}
+
+      {/* Cache Manager Modal */}
+      {showCacheManager && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50">
+          <div className="relative max-w-md w-full mx-4">
+            <CacheManager />
+            <button
+              onClick={() => setShowCacheManager(false)}
+              className="absolute top-2 right-2 text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200"
+            >
+              <svg
+                className="w-6 h-6"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth="2"
+                  d="M6 18L18 6M6 6l12 12"
+                />
+              </svg>
+            </button>
+          </div>
+        </div>
+      )}
+
+      {/* Cache Manager Button - Only in development */}
+      {process.env.NODE_ENV === "development" && (
+        <button
+          onClick={() => setShowCacheManager(true)}
+          className="fixed bottom-4 left-4 z-40 bg-gray-600 hover:bg-gray-700 text-white p-3 rounded-full shadow-lg transition-colors"
+          title="مدیریت فایل‌های صوتی"
+        >
+          <svg
+            className="w-5 h-5"
+            fill="none"
+            stroke="currentColor"
+            viewBox="0 0 24 24"
+          >
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              strokeWidth="2"
+              d="M4 7v10c0 2.21 3.582 4 8 4s8-1.79 8-4V7M4 7c0 2.21 3.582 4 8 4s8-1.79 8-4M4 7c0-2.21 3.582-4 8-4s8 1.79 8 4"
+            />
+          </svg>
+        </button>
+      )}
+
       <StagewiseToolbar
         config={{
           plugins: [ReactPlugin],

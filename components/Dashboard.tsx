@@ -37,26 +37,27 @@ const Dashboard = ({ onSelectCategory, progress }: DashboardProps) => {
       return { percentage: 0, score: 0 };
     }
 
-    const totalItems = category.dhikrIds.length;
+    // Calculate total items across all subcategories
+    const totalItems = category.subcategories.reduce((total, subcategory) => {
+      return total + subcategory.dhikrIds.length;
+    }, 0);
+
     if (totalItems === 0) {
       return { percentage: 0, score: categoryProgress.score || 0 };
     }
 
     let completedItems = 0;
-    category.dhikrIds.forEach((item) => {
-      if (typeof item === "number") {
-        if (
-          (categoryProgress.completedStages?.[item] || 0) >=
-          TOTAL_STAGES_PER_DHIKR
-        ) {
-          completedItems++;
+    category.subcategories.forEach((subcategory) => {
+      subcategory.dhikrIds.forEach((item) => {
+        if (typeof item === "number") {
+          if (
+            (categoryProgress.completedStages?.[item] || 0) >=
+            TOTAL_STAGES_PER_DHIKR
+          ) {
+            completedItems++;
+          }
         }
-      } else {
-        // It's a review string
-        if (categoryProgress.completedReviews?.[item]) {
-          completedItems++;
-        }
-      }
+      });
     });
 
     const percentage = totalItems > 0 ? (completedItems / totalItems) * 100 : 0;
